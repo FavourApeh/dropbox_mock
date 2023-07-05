@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>File Upload and Download</title>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js"></script>
+  <link rel="stylesheet" href="upload.css">
+</head>
+<body>
+  <div class="container">
+    <h1>File Upload and Download</h1>
+    <label for="fileInput" class="custom-file-upload">Select File</label>
+    <input type="file" id="fileInput">
+    <button id="upload-button" class="custom-file-upload">Upload File</button>
+    <input type="text" id="filename-input" class="filename-input" placeholder="Enter filename">
+    <a href="#" id="download-button" class="download-button">Download File</a>
+  </div>
+  <script type="module">
+    // Initialize Firebase
+    // Replace with your Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyCzLs4g0S6Uuxm5CdO8bv8m4MNmze1_l0E",
+      authDomain: "newlogin-d01d2.firebaseapp.com",
+      projectId: "newlogin-d01d2",
+      storageBucket: "newlogin-d01d2.appspot.com",
+      messagingSenderId: "472684104735",
+      appId: "1:472684104735:web:c7234118fc42b6d139d92a"
+    };
+
+    // Initialize Firebase app
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getAuth } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js";
+
+    const app = initializeApp(firebaseConfig);
+    const storage = getStorage(app);
+    const auth = getAuth(app);
+
+    // Upload file function
+    const uploadFile = () => {
+      const fileInput = document.getElementById('fileInput');
+      const file = fileInput.files[0];
+      const user = auth.currentUser;
+
+      if (!user) {
+        alert('User not logged in.');
+        return;
+      }
+
+      const storageRef = ref(storage, `userFiles/${user.uid}/${file.name}`);
+
+      uploadBytes(storageRef, file)
+        .then(() => {
+          console.log('File uploaded successfully.');
+          alert('File uploaded successfully.');
+        })
+        .catch(error => {
+          console.error('Error uploading file:', error);
+          alert('Error uploading file:', error);
+        });
+    };
+
+    // Download file function
+    
+  const downloadFile = () => {
+  const user = auth.currentUser;
+  const filenameInput = document.getElementById('filename-input');
+  const filename = filenameInput.value;
+
+  if (!user) {
+    alert('User not logged in.');
+    return;
+  }
+
+  const storageRef = ref(storage, `userFiles/${user.uid}/${filename}`);
+
+  getDownloadURL(storageRef)
+    .then(url => {
+      console.log('File download URL:', url);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      link.click();
+      // Perform additional actions if needed
+    })
+    .catch(error => {
+      console.error('Error getting file download URL:', error);
+      alert('Error getting file download URL:', error);
+    });
+};
+
+
+    // Attach event listeners for upload and download buttons
+    document.addEventListener("DOMContentLoaded", () => {
+      const uploadButton = document.getElementById("upload-button");
+      const downloadButton = document.getElementById("download-button");
+
+      uploadButton.addEventListener("click", uploadFile);
+      downloadButton.addEventListener("click", downloadFile);
+    });
+
+    
+  </script>
+</body>
+</html>
